@@ -1,0 +1,2 @@
+// stores the default creds for each service
+// scaner.py will be updated to use these creds as part of its weak creds checker
