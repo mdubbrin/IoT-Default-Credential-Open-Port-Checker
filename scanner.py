@@ -1,7 +1,16 @@
 import socket
+import json
+
+def load_defaults(path="defaults.json"):
+    with open(path) as f:
+        return json.load(f)
+
+def defaults_for_port(defaults, port):
+    return [d for d in defaults if d["port"] == port]
 
 PORTS = {
     21: "FTP",
+    22: "SSH",
     23: "Telnet",
     80: "HTTP",
     443: "HTTPS",
@@ -51,8 +60,9 @@ def print_results(ip, results):
 
 
 if __name__ == "__main__":
-
     import sys
+
+    print("This tool is for educational purposes only. Do not use this against anything that you do not own or have explicit, written permission from the owner to test. You have been warned....\n\n\n")
 
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <targets_file> [timeout_sec]")
@@ -60,6 +70,8 @@ if __name__ == "__main__":
 
     targets_file = sys.argv[1]
     timeout = int(sys.argv[2]) if len(sys.argv) > 2 else 2
+
+    defaults = load_defaults()
 
     total_targets = 0
     total_open = 0
@@ -72,5 +84,4 @@ if __name__ == "__main__":
             total_targets += 1
             results = scan_target(ip, timeout)
             total_open += print_results(ip, results)
-
     print(f"\nNumber of targets scanned:{total_targets}\nNumber of open ports:{total_open}")

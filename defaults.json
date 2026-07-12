@@ -1,2 +1,27 @@
-// stores the default creds for each service
-// scaner.py will be updated to use these creds as part of its weak creds checker
+[
+    {"_comment": "stores the default creds for each service"},
+    {"service": "http", "port": 80, "username": "admin", "password": "admin"},
+    {"service": "http", "port": 80, "username": "admin", "password": "1234"},
+    {"service": "http", "port": 80, "username": "admin", "password": ""},
+    {"service": "http", "port": 80, "username": "admin", "password": "password"},
+    {"service": "http", "port": 8080, "username": "admin", "password": "admin"},
+    {"service": "http", "port": 8081, "username": "admin", "password": "admin"},
+    {"service": "http", "port": 80, "username": "admin", "password": "admin"},
+    {"service": "telnet", "port": 23, "username": "admin", "password": "admin"},
+    {"service": "telnet", "port": 23, "username": "root", "password": "root"},
+    {"service": "telnet", "port": 23, "username": "admin", "password": ""},
+    {"service": "telnet", "port": 23, "username": "admin", "password": "admin"},
+    {"service": "telnet", "port": 23, "username": "root", "password": "root"},
+    {"service": "telnet", "port": 23, "username": "admin", "password": ""},
+    {"service": "mqtt", "port": 1883, "username": null, "password": null},
+    {"service": "rtsp", "port": 554, "username": "admin", "password": "admin"},
+    {"service": "rtsp", "port": 554, "username": "admin", "password": "12345"},
+    {"service": "rtsp", "port": 554, "username": "admin", "password": ""},
+    {"service": "ssh", "port": 22, "username": "root", "password": "root"},
+    {"service": "ssh", "port": 22, "username": "admin", "password": "admin"},
+    {"service": "ssh", "port": 22, "username": "root", "password": ""}
+
+
+
+
+]
