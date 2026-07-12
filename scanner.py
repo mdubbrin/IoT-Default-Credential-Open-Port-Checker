@@ -1,13 +1,73 @@
-import socket
+import argparse
 import json
+import socket
 
 def load_defaults(path="defaults.json"):
     with open(path) as f:
         return json.load(f)
 
+
+def load_wordlist(path):
+    passwords = []
+    seen = set()
+
+    with open(path) as f:
+        for line in f:
+            password = line.rstrip("\n\r")
+            password = password.strip()
+            if not password or password.startswith("#"):
+                continue
+            if password in seen:
+                continue
+            seen.add(password)
+            passwords.append(password)
+
+    return passwords
+
 def defaults_for_port(defaults, port):
     return [d for d in defaults if d["port"] == port]
 
+
+def credential_candidates_for_port(defaults, port, extra_passwords=None):
+    candidates = []
+    seen = set()
+
+    for entry in defaults_for_port(defaults, port):
+        username = entry.get("username")
+        password = entry.get("password")
+
+        if username is None:
+            continue
+
+        key = (entry["service"], entry["port"], username, password)
+        if key not in seen:
+            seen.add(key)
+            candidates.append({
+                "service": entry["service"],
+                "port": entry["port"],
+                "username": username,
+                "password": password,
+                "source": "default",
+            })
+
+        if not extra_passwords:
+            continue
+
+        for extra_password in extra_passwords:
+            key = (entry["service"], entry["port"], username, extra_password)
+            if key in seen:
+                continue
+            seen.add(key)
+            candidates.append({
+                "service": entry["service"],
+                "port": entry["port"],
+                "username": username,
+                "password": extra_password,
+                "source": "wordlist",
+            })
+
+    return candidates
+#List of standard service ports
 PORTS = {
     21: "FTP",
     22: "SSH",
@@ -61,19 +121,45 @@ def print_results(ip, results):
     return open_count
 
 
-if __name__ == "__main__":
-    import sys
+def print_credential_candidates(results, defaults, extra_passwords=None, limit=5):
+    printed_header = False
 
+    for port, (name, is_open) in results.items():
+        if not is_open:
+            continue
+
+        candidates = credential_candidates_for_port(defaults, port, extra_passwords)
+        if not candidates:
+            continue
+
+        if not printed_header:
+            print("\nCredential candidates:")
+            printed_header = True
+
+        print(f"{port:<6} {name:<15} {len(candidates)} candidates")
+
+        for candidate in candidates[:limit]:
+            password = candidate["password"] if candidate["password"] != "" else "<blank>"
+            print(f"      {candidate['username']} / {password} [{candidate['source']}]")
+
+        if len(candidates) > limit:
+            print(f"      ... {len(candidates) - limit} more")
+
+
+if __name__ == "__main__":
     print("This tool is for educational purposes only. Do not use this against anything that you do not own or have explicit, written permission from the owner to test. You have been warned....\n\n\n")
 
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <targets_file> [timeout_sec]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Scan targets for common open ports and report known credential candidates.")
+    parser.add_argument("targets_file", help="File containing one target IP or host per line")
+    parser.add_argument("timeout_sec", nargs="?", type=int, default=2, help="Socket timeout in seconds")
+    parser.add_argument("--wordlist", "-w", help="Optional password wordlist to augment the default credential list")
+    args = parser.parse_args()
 
-    targets_file = sys.argv[1]
-    timeout = int(sys.argv[2]) if len(sys.argv) > 2 else 2
+    targets_file = args.targets_file
+    timeout = args.timeout_sec
 
     defaults = load_defaults()
+    extra_passwords = load_wordlist(args.wordlist) if args.wordlist else None
 
     total_targets = 0
     total_open = 0
@@ -86,4 +172,6 @@ if __name__ == "__main__":
             total_targets += 1
             results = scan_target(ip, timeout)
             total_open += print_results(ip, results)
+            if extra_passwords:
+                print_credential_candidates(results, defaults, extra_passwords)
     print(f"\nNumber of targets scanned:{total_targets}\nNumber of open ports:{total_open}")
