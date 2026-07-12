@@ -19,7 +19,13 @@
     {"service": "rtsp", "port": 554, "username": "admin", "password": ""},
     {"service": "ssh", "port": 22, "username": "root", "password": "root"},
     {"service": "ssh", "port": 22, "username": "admin", "password": "admin"},
-    {"service": "ssh", "port": 22, "username": "root", "password": ""}
+    {"service": "ssh", "port": 22, "username": "root", "password": ""},
+    {"service": "mysql", "port": 3306, "username": "root", "password": ""},
+    {"service": "rdp", "port": 3389, "username": "admin", "password": ""},
+    {"service": "rdp", "port": 3389, "username": "admin", "password": "admin"},
+    {"service": "rdp", "port": 3389, "username": "admin", "password": "password"}
+
+
 
 
 

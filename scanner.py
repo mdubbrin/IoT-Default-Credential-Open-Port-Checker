@@ -16,6 +16,8 @@ PORTS = {
     443: "HTTPS",
     554: "RTSP",
     1883: "MQTT",
+    3306: "MYSQL",
+    3386: "RDP",
     8080: "HTTP-alt",
     8081: "HTTP-alt2",
     8443: "HTTPS-alt",
